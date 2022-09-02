@@ -134,6 +134,7 @@ function POST(data) {
             console.log(data.status + ':' + data.statusText, data.responseText);
         }
     });
+    window.location.reload()
 }
 
 //veri tabanı getirme
@@ -145,6 +146,7 @@ function GET() {
         dataType: 'JSON',
         success: function(data) {
             data.forEach(getir);
+            btnhazırla()
         }
     });
 }
@@ -189,21 +191,22 @@ function getir(item, index, arr) {
     tr.appendChild(tdel);
 
     tblbd.appendChild(tr);
-    console.log(silbtn[0]);
-    console.log(silbtn[1]);
-    console.log(silbtn.length)
 }
+//SİL butonlarının dinleme olayları
 
 var silbtn = document.getElementsByClassName("sil");
 
-for (var i = 0; i < silbtn.length; i++) {
-    console.log("merhaba");
-    silbtn[i].addEventListener("click", () => {
-        console.log("merhaba")
-        DELETE(id)
-    });
+function btnhazırla() {
+    for (var i = 0; i < silbtn.length; i++) {
+        (function(index) {
+            silbtn[index].addEventListener("click", () => {
+                DELETE(silbtn[index].id)
+            });
+        })(i)
+    }
 }
 
+//veri tabanı getirme
 function DELETE(id) {
     $.ajax({
         type: "DELETE",
@@ -212,9 +215,7 @@ function DELETE(id) {
         dataType: 'JSON',
         success: function() {
             console.log("Silme Başarılı");
-        },
-        error: function() {
-            console.log("Error");
         }
     });
+    window.location.reload()
 }
