@@ -1,0 +1,191 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    text-decoration: none;
+    font-size: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background-color: #8fa6ad;
+}
+
+#Header {
+    top: 20px;
+    position: relative;
+    margin-left: 40%;
+    font-family: sans-serif;
+    color: white;
+}
+
+#headImg {
+    width: 25%;
+    height: 25%;
+    position: relative;
+    float: left;
+}
+
+.bg-light {
+    background: rgb(2, 0, 36);
+    background: linear-gradient(90deg, rgba(2, 0, 36, 1) 4%, rgba(25, 170, 117, 1) 43%, rgba(0, 212, 255, 1) 100%);
+}
+
+.map {
+    width: 80%;
+    height: 60%;
+    margin: 2% 10% 0% 10%;
+    border: 4px solid black;
+}
+
+.modal {
+    display: none;
+    border: 5px solid whitesmoke;
+    background-color: #14b29147;
+    width: 45%;
+    height: 90%;
+    border-radius: 5%;
+    position: fixed;
+    top: 10%;
+    padding: 10px;
+    left: 25%;
+}
+
+.modal-content {
+    border: 1px solid rgb(0 0 0 / 40%);
+    width: 90%;
+    margin: 5%;
+}
+
+.btnParselClose {
+    margin-top: 3%;
+    padding: 1%;
+    text-align: center;
+    background-color: white;
+    border: 2px solid #8a7979;
+    border-radius: 30%;
+    color: #8e7d7d;
+    width: 10%;
+    font-size: 100%;
+    margin-left: 85%;
+}
+
+.btnParselClose:hover {
+    background-color: #12b69de6;
+    color: #f2efe9;
+    border: 2px solid #12b69de6;
+}
+
+.formSave {
+    padding: 5%;
+}
+
+.form-add {
+    background-color: #f2efe9;
+    display: grid;
+    padding: 5%;
+    border-radius: 5%;
+    padding-bottom: 30%;
+}
+
+#sehir-name,
+#ilce-name {
+    margin-top: 5%;
+}
+
+.btnParselSave {
+    background-color: white;
+    margin-top: -20%;
+    width: 40%;
+    height: 10%;
+    border: 2px solid #8a7979;
+    margin-left: 30%;
+    border-radius: 10px;
+    color: #8e7d7d;
+    text-align: center;
+    font-size: 100%;
+}
+
+.btnParselSave:hover {
+    background-color: #12b69de6;
+    border: 2px solid #12b69de6;
+    color: #f2efe9;
+}
+
+.btnParselSave p {
+    margin: 4%;
+}
+
+.input {
+    width: 100%;
+}
+
+.sectionslct {
+    background-color: #f2efe9;
+    margin: 2% 10% 2% 10%;
+    padding: 2%;
+    text-align: center;
+    font-size: 1.3em;
+}
+
+@media screen and (max-width: 1000px) {
+    .btnParselSave p {
+        font-size: 1em;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .btnParselSave p {
+        font-size: 0.7em;
+    }
+}
+
+@media screen and (max-width: 650px) {
+    .btnParselSave p {
+        font-size: 0.7em;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .btnParselSave p {
+        font-size: 0.4em;
+    }
+}
+
+@media screen and (max-width: 1270px) {
+    .modal {
+        height: 85%;
+    }
+}
+
+@media screen and (max-width: 1170px) {
+    .modal {
+        height: 80%;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .modal {
+        height: 75%;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .modal {
+        height: 60%;
+    }
+}
+
+@media screen and (max-width: 350px) {
+    .modal {
+        height: 50%;
+    }
+}
+
+#containerTbl {
+    background-color: #f2efe9;
+    position: relative;
+    float: left;
+    margin: 2% 3% 2% 2%;
+    width: 95%;
+    text-align: center;
+}
