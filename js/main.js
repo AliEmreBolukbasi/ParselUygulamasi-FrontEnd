@@ -2,7 +2,7 @@ var addModal = document.getElementById("myModal");
 var closeBtn = document.getElementById("closeParsel");
 var parselSave = document.getElementById("saveParsel");
 var mapfcs = document.getElementById("map");
-var inputclr = document.querySelectorAll(".form-add .input");
+var inpclr = document.querySelectorAll("input");
 
 var wktFortmat = new ol.format.WKT();
 
@@ -51,7 +51,6 @@ var map = new ol.Map({
         maxZoom: 10,
         minZoom: 3,
         rotation: 1
-
     })
 });
 
@@ -63,6 +62,7 @@ const typeSelect = document.getElementById('type');
 addInteractions();
 GET();
 
+//çizim tipi değişince
 typeSelect.onchange = () => {
     map.removeInteraction(draw);
     addInteractions();
@@ -78,13 +78,19 @@ function addInteractions() {
         draw.on('drawend', drawend);
     }
 }
-
+//çizim bitince
 function drawend() {
     addModal.style.display = "block";
     mapfcs.style.pointerEvents = 'none';
     typeSelect.style.pointerEvents = 'none';
-}
 
+    inpclr.forEach(function(inpt) {
+        inpt.value = "";
+    });
+
+
+}
+//ekleme sayfa kapatma
 closeBtn.addEventListener("click", () => {
     map.removeInteraction(draw);
     var a = source.getFeatures();
@@ -94,9 +100,9 @@ closeBtn.addEventListener("click", () => {
     mapfcs.style.pointerEvents = "";
     typeSelect.style.pointerEvents = "";
     addInteractions();
-    inputclr.value = "";
 });
 
+//ekleme sayfa kaydet
 parselSave.addEventListener("click", () => {
     var datas = source.getFeatures()
     const x = wktFortmat.writeFeature(datas[datas.length - 1])
@@ -113,6 +119,7 @@ parselSave.addEventListener("click", () => {
     POST(data);
 });
 
+//ekleme veri tabanına gönder
 function POST(data) {
     $.ajax({
         type: "POST",
@@ -129,6 +136,7 @@ function POST(data) {
     });
 }
 
+//veri tabanı getirme
 function GET() {
     $.ajax({
         type: "GET",
@@ -140,6 +148,7 @@ function GET() {
         }
     });
 }
+//veri tabanı getirme tablo aktarma
 var tblbd = document.getElementById("tblBody");
 
 function getir(item, index, arr) {

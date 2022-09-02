@@ -45,13 +45,13 @@
             <div class="formSave">
                 <form class="form-add">
                     <label id="ulke-name" for="Uname">Ülke</label>
-                    <input class="input" type="text" id="Ulke" name="ulke">
+                    <input class="input" type="text" id="Ulke" name="ulke" onfocus="javascript: if(this.value != ''){ this.value = ''; }">
 
                     <label id="sehir-name" for="Sname">Şehir</label>
-                    <input class="input" type="text" id="Sehir" name="sehir">
+                    <input class="input" type="text" id="Sehir" name="sehir" onfocus="javascript: if(this.value != ''){ this.value = ''; }">
 
                     <label id="ilce-name" for="Iname">İlçe</label>
-                    <input class="input" type="text" id="Ilce" name="ilce">
+                    <input class="input" type="text" id="Ilce" name="ilce" onfocus="javascript: if(this.value != ''){ this.value = ''; }">
                 </form>
                 <button class="btnParselSave" id="saveParsel"><p>Parseli Kaydet</p></button>
             </div>
