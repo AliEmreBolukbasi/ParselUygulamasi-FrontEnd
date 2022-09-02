@@ -128,7 +128,7 @@ function POST(data) {
         data: JSON.stringify(data),
         dataType: 'JSON',
         success: function() {
-            console.log("ekleme başarılı");
+            console.log("Ekleme Başarılı");
         },
         error: function(data) {
             console.log(data.status + ':' + data.statusText, data.responseText);
@@ -152,7 +152,6 @@ function GET() {
 var tblbd = document.getElementById("tblBody");
 
 function getir(item, index, arr) {
-    console.log(item, index)
     let tid = document.createElement("td");
     let tulke = document.createElement("td");
     let tsehir = document.createElement("td");
@@ -164,11 +163,13 @@ function getir(item, index, arr) {
 
     btnedit.type = "button";
     btnedit.innerHTML = "GÜNCELLE";
-    btnedit.className = "btn btn-primary";
+    btnedit.className = "edit btn btn-primary";
+    btnedit.id = item.id;
 
     btnsil.type = "button";
     btnsil.innerHTML = "SİL";
-    btnsil.className = "btn btn-danger";
+    btnsil.className = "sil btn btn-danger";
+    btnsil.id = item.id;
 
     tedit.appendChild(btnedit);
     tdel.appendChild(btnsil);
@@ -188,4 +189,32 @@ function getir(item, index, arr) {
     tr.appendChild(tdel);
 
     tblbd.appendChild(tr);
+    console.log(silbtn[0]);
+    console.log(silbtn[1]);
+    console.log(silbtn.length)
+}
+
+var silbtn = document.getElementsByClassName("sil");
+
+for (var i = 0; i < silbtn.length; i++) {
+    console.log("merhaba");
+    silbtn[i].addEventListener("click", () => {
+        console.log("merhaba")
+        DELETE(id)
+    });
+}
+
+function DELETE(id) {
+    $.ajax({
+        type: "DELETE",
+        url: "https://localhost:5001/Parsel/" + id,
+        contentType: 'application/json',
+        dataType: 'JSON',
+        success: function() {
+            console.log("Silme Başarılı");
+        },
+        error: function() {
+            console.log("Error");
+        }
+    });
 }

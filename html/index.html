@@ -58,20 +58,35 @@
             <!-- onclick="saveParsel()" -->
         </div>
     </div>
-
-    <table id="containerTbl" class="table table-striped">
-        <thead>
-            <tr>
-                <th id="rowId" scope="col">#</th>
-                <th id="ulke" scope="col">ÜLKE</th>
-                <th id="sehir" scope="col">İL</th>
-                <th id="ilce" scope="col">İLÇE</th>
-                <th id="islemler" scope="col"></th>
-            </tr>
-        </thead>
-        <tbody id="tblBody"></tbody>
-    </table>
+    <div class="scroll scrollbar">
+        <table id="containerTbl" class="table table-striped">
+            <thead>
+                <tr>
+                    <th id="rowId" scope="col">#</th>
+                    <th id="ulke" scope="col">ÜLKE</th>
+                    <th id="sehir" scope="col">İL</th>
+                    <th id="ilce" scope="col">İLÇE</th>
+                    <th id="islemler" scope="col">
+                        <input class="form-control" id="myInput" type="text" placeholder="Filtrele" style="margin-left:40%; background:#c8baba url(/res/search.svg) no-repeat 10px 10px;background-size: 20px; width:60%; height:40px;" onfocus="javascript: if(this.value != ''){ this.value = ''; }">
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="tblBody"></tbody>
+        </table>
+    </div>
     <script type="module" src="../js/main.js"></script>
+    <script>
+        //Tabloyu filtreleme
+        $(document).ready(function() {
+            $("#myInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#tblBody tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
+
 </body>
 
 </html>
