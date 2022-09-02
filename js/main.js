@@ -2,6 +2,7 @@ var addModal = document.getElementById("myModal");
 var closeBtn = document.getElementById("closeParsel");
 var parselSave = document.getElementById("saveParsel");
 var mapfcs = document.getElementById("map");
+var inputclr = document.querySelectorAll(".form-add .input");
 
 var wktFortmat = new ol.format.WKT();
 
@@ -54,15 +55,13 @@ var map = new ol.Map({
     })
 });
 
-
-
-
 let draw;
 
 const typeSelect = document.getElementById('type');
 
 //sayfa yüklendiğinde
 addInteractions();
+GET();
 
 typeSelect.onchange = () => {
     map.removeInteraction(draw);
@@ -95,6 +94,7 @@ closeBtn.addEventListener("click", () => {
     mapfcs.style.pointerEvents = "";
     typeSelect.style.pointerEvents = "";
     addInteractions();
+    inputclr.value = "";
 });
 
 parselSave.addEventListener("click", () => {
@@ -111,8 +111,6 @@ parselSave.addEventListener("click", () => {
     mapfcs.style.pointerEvents = "";
     typeSelect.style.pointerEvents = "";
     POST(data);
-    GET();
-    debugger;
 });
 
 function POST(data) {
@@ -122,9 +120,8 @@ function POST(data) {
         contentType: 'application/json',
         data: JSON.stringify(data),
         dataType: 'JSON',
-        success: function(res) {
-            console.log(res);
-            alert(res);
+        success: function() {
+            console.log("ekleme başarılı");
         },
         error: function(data) {
             console.log(data.status + ':' + data.statusText, data.responseText);
@@ -137,13 +134,49 @@ function GET() {
         type: "GET",
         url: "https://localhost:5001/Parsel",
         contentType: 'application/json',
-        success: function(res) {
-            console.log(res);
-            alert(res);
+        dataType: 'JSON',
+        success: function(data) {
+            data.forEach(getir);
         }
     });
 }
+var tblbd = document.getElementById("tblBody");
 
 function getir(item, index, arr) {
-    debugger;
+    console.log(item, index)
+    let tid = document.createElement("td");
+    let tulke = document.createElement("td");
+    let tsehir = document.createElement("td");
+    let tilce = document.createElement("td");
+    let tedit = document.createElement("td");
+    let tdel = document.createElement("td");
+    let btnedit = document.createElement("button");
+    let btnsil = document.createElement("button");
+
+    btnedit.type = "button";
+    btnedit.innerHTML = "GÜNCELLE";
+    btnedit.className = "btn btn-primary";
+
+    btnsil.type = "button";
+    btnsil.innerHTML = "SİL";
+    btnsil.className = "btn btn-danger";
+
+    tedit.appendChild(btnedit);
+    tdel.appendChild(btnsil);
+
+    tid.textContent = index + 1;
+    tulke.textContent = item.ulke;
+    tsehir.textContent = item.sehir;
+    tilce.textContent = item.ilce;
+
+    let tr = document.createElement("tr");
+
+    tr.appendChild(tid);
+    tr.appendChild(tulke);
+    tr.appendChild(tsehir);
+    tr.appendChild(tilce);
+    tr.appendChild(tedit);
+    tr.appendChild(tdel);
+
+    tblbd.appendChild(tr);
 }
