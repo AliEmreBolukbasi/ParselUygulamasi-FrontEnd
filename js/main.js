@@ -3,6 +3,8 @@ var closeBtn = document.getElementById("closeParsel");
 var parselSave = document.getElementById("saveParsel");
 var mapfcs = document.getElementById("map");
 var inpclr = document.querySelectorAll("input");
+var toggledata = -1;
+
 
 var wktFortmat = new ol.format.WKT();
 
@@ -60,7 +62,7 @@ const typeSelect = document.getElementById('type');
 
 //sayfa yüklendiğinde
 addInteractions();
-GET();
+GETALL();
 
 //çizim tipi değişince
 typeSelect.onchange = () => {
@@ -102,21 +104,32 @@ closeBtn.addEventListener("click", () => {
     addInteractions();
 });
 
-//ekleme sayfa kaydet
+//Ekleme ve Düzenleme sayfa kaydet
 parselSave.addEventListener("click", () => {
-    var datas = source.getFeatures()
-    const x = wktFortmat.writeFeature(datas[datas.length - 1])
-
-    var data = {
-        "Ulke": $("#myModal #Ulke").val(),
-        "Sehir": $("#myModal #Sehir").val(),
-        "Ilce": $("#myModal #Ilce").val()
-    }
-
     addModal.style.display = "";
     mapfcs.style.pointerEvents = "";
     typeSelect.style.pointerEvents = "";
-    POST(data);
+
+    if (toggledata == -1) {
+        var data = {
+            "Ulke": $("#myModal #Ulke").val(),
+            "Sehir": $("#myModal #Sehir").val(),
+            "Ilce": $("#myModal #Ilce").val()
+        }
+        var datas = source.getFeatures()
+        const x = wktFortmat.writeFeature(datas[datas.length - 1])
+        POST(data);
+    } else {
+        var data = {
+            "Id": toggledata,
+            "Ulke": $("#myModal #Ulke").val(),
+            "Sehir": $("#myModal #Sehir").val(),
+            "Ilce": $("#myModal #Ilce").val()
+        }
+        UPDATE(data);
+        toggledata = -1;
+    }
+
 });
 
 //ekleme veri tabanına gönder
@@ -138,7 +151,7 @@ function POST(data) {
 }
 
 //veri tabanı getirme
-function GET() {
+function GETALL() {
     $.ajax({
         type: "GET",
         url: "https://localhost:5001/Parsel",
@@ -146,7 +159,8 @@ function GET() {
         dataType: 'JSON',
         success: function(data) {
             data.forEach(getir);
-            btnhazırla()
+            btnSilHazırla()
+            btnEditHazırla()
         }
     });
 }
@@ -194,13 +208,13 @@ function getir(item, index, arr) {
 }
 //SİL butonlarının dinleme olayları
 
-var silbtn = document.getElementsByClassName("sil");
+var silBtn = document.getElementsByClassName("sil");
 
-function btnhazırla() {
-    for (var i = 0; i < silbtn.length; i++) {
+function btnSilHazırla() {
+    for (var i = 0; i < silBtn.length; i++) {
         (function(index) {
-            silbtn[index].addEventListener("click", () => {
-                DELETE(silbtn[index].id)
+            silBtn[index].addEventListener("click", () => {
+                DELETE(silBtn[index].id)
             });
         })(i)
     }
@@ -215,6 +229,68 @@ function DELETE(id) {
         dataType: 'JSON',
         success: function() {
             console.log("Silme Başarılı");
+        }
+    });
+    window.location.reload()
+}
+
+//Update butonlarının dinleme olayları
+
+var updateBtn = document.getElementsByClassName("edit");
+
+function btnEditHazırla() {
+    for (var i = 0; i < updateBtn.length; i++) {
+        (function(index) {
+            updateBtn[index].addEventListener("click", () => {
+                GET(updateBtn[index].id)
+            });
+        })(i)
+    }
+}
+
+//veri tabanı id ye göre getirme
+function GET(id) {
+    $.ajax({
+        type: "GET",
+        url: "https://localhost:5001/Parsel/" + id,
+        contentType: 'application/json',
+        dataType: 'JSON',
+        success: function(data) {
+            addModal.style.display = "block";
+            yerlestir(data)
+            toggledata = id;
+            console.log("Getirme Başarılı");
+        },
+        error: function(data) {
+            console.log(data.status + ':' + data.statusText, data.responseText);
+        }
+    });
+}
+
+//modala yerleştirme
+var mdlUlke = document.getElementById("Ulke");
+var mdlSehir = document.getElementById("Sehir");
+var mdlIlce = document.getElementById("Ilce");
+
+function yerlestir(data) {
+    mdlUlke.value = data.ulke;
+    mdlSehir.value = data.sehir;
+    mdlIlce.value = data.ilce;
+}
+
+//veri tabanı güncelleme
+function UPDATE(data) {
+    $.ajax({
+        type: "PUT",
+        url: "https://localhost:5001/Parsel",
+        contentType: 'application/json',
+        dataType: 'JSON',
+        data: JSON.stringify(data),
+        success: function() {
+            console.log("Güncelleme Başarılı");
+        },
+        error: function(data) {
+            console.log(data.status + ':' + data.statusText, data.responseText);
         }
     });
     window.location.reload()
