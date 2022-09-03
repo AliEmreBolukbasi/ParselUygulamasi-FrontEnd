@@ -94,14 +94,22 @@ function drawend() {
 }
 //ekleme sayfa kapatma
 closeBtn.addEventListener("click", () => {
-    map.removeInteraction(draw);
-    var a = source.getFeatures();
-    var b = a[a.length - 1];
-    source.removeFeature(b);
-    addModal.style.display = "";
-    mapfcs.style.pointerEvents = "";
-    typeSelect.style.pointerEvents = "";
-    addInteractions();
+    if (toggledata == -1) {
+        map.removeInteraction(draw);
+        var a = source.getFeatures();
+        var b = a[a.length - 1];
+        source.removeFeature(b);
+        addModal.style.display = "";
+        mapfcs.style.pointerEvents = "";
+        typeSelect.style.pointerEvents = "";
+        addInteractions();
+    } else {
+        addModal.style.display = "";
+        mapfcs.style.pointerEvents = "";
+        typeSelect.style.pointerEvents = "";
+        addInteractions();
+    }
+
 });
 
 //Ekleme ve Düzenleme sayfa kaydet
@@ -111,20 +119,22 @@ parselSave.addEventListener("click", () => {
     typeSelect.style.pointerEvents = "";
 
     if (toggledata == -1) {
+        var datas = source.getFeatures()
+        const x = wktFortmat.writeFeature(datas[datas.length - 1])
         var data = {
             "Ulke": $("#myModal #Ulke").val(),
             "Sehir": $("#myModal #Sehir").val(),
-            "Ilce": $("#myModal #Ilce").val()
+            "Ilce": $("#myModal #Ilce").val(),
+            "WktString": x
         }
-        var datas = source.getFeatures()
-        const x = wktFortmat.writeFeature(datas[datas.length - 1])
         POST(data);
     } else {
         var data = {
             "Id": toggledata,
             "Ulke": $("#myModal #Ulke").val(),
             "Sehir": $("#myModal #Sehir").val(),
-            "Ilce": $("#myModal #Ilce").val()
+            "Ilce": $("#myModal #Ilce").val(),
+            "WktString": $("#myModal #Wkt").val()
         }
         UPDATE(data);
         toggledata = -1;
@@ -168,10 +178,12 @@ function GETALL() {
 var tblbd = document.getElementById("tblBody");
 
 function getir(item, index, arr) {
+    //tablo oluşturma
     let tid = document.createElement("td");
     let tulke = document.createElement("td");
     let tsehir = document.createElement("td");
     let tilce = document.createElement("td");
+    let tkrdnt = document.createElement("td");
     let tedit = document.createElement("td");
     let tdel = document.createElement("td");
     let btnedit = document.createElement("button");
@@ -194,6 +206,7 @@ function getir(item, index, arr) {
     tulke.textContent = item.ulke;
     tsehir.textContent = item.sehir;
     tilce.textContent = item.ilce;
+    tkrdnt.textContent = item.wktString;
 
     let tr = document.createElement("tr");
 
@@ -201,10 +214,19 @@ function getir(item, index, arr) {
     tr.appendChild(tulke);
     tr.appendChild(tsehir);
     tr.appendChild(tilce);
+    tr.appendChild(tkrdnt);
     tr.appendChild(tedit);
     tr.appendChild(tdel);
 
     tblbd.appendChild(tr);
+
+    //feature ekleme
+    const parcel = wktFortmat.readFeature(item.wktString, {
+        dataProjection: 'EPSG:3857',
+        featureProjection: 'EPSG:3857',
+    });
+    source.addFeature(parcel)
+
 }
 //SİL butonlarının dinleme olayları
 
@@ -271,11 +293,13 @@ function GET(id) {
 var mdlUlke = document.getElementById("Ulke");
 var mdlSehir = document.getElementById("Sehir");
 var mdlIlce = document.getElementById("Ilce");
+var mdWkt = document.getElementById("Wkt");
 
 function yerlestir(data) {
     mdlUlke.value = data.ulke;
     mdlSehir.value = data.sehir;
     mdlIlce.value = data.ilce;
+    mdWkt.value = data.wktString;
 }
 
 //veri tabanı güncelleme

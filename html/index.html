@@ -52,6 +52,9 @@
 
                     <label id="ilce-name" for="Iname">İlçe</label>
                     <input class="input" type="text" id="Ilce" name="ilce" onfocus="javascript: if(this.value != ''){ this.value = ''; }">
+
+                    <label id="wkt-name" for="Wname">Koordinatlar</label>
+                    <input class="input" type="text" id="Wkt" name="wkt" disabled>
                 </form>
                 <button class="btnParselSave" id="saveParsel"><p>Parseli Kaydet</p></button>
             </div>
@@ -66,8 +69,9 @@
                     <th id="ulke" scope="col">ÜLKE</th>
                     <th id="sehir" scope="col">İL</th>
                     <th id="ilce" scope="col">İLÇE</th>
+                    <th id="ilce" scope="col">KOORDİNAT</th>
                     <th id="islemler" scope="col">
-                        <input class="form-control" id="myInput" type="text" placeholder="Filtrele" style="margin-left:40%; background:#c8baba url(/res/search.svg) no-repeat 10px 10px;background-size: 20px; width:60%; height:40px;" onfocus="javascript: if(this.value != ''){ this.value = ''; }">
+                        <input class="form-control" id="myInput" type="text" placeholder="Filtrele" style="margin-left:30%; background:#c8baba url(/res/search.svg) no-repeat 10px 10px;background-size: 20px; width:100%; height:40px;" onfocus="javascript: if(this.value != ''){ this.value = ''; }">
                     </th>
                 </tr>
             </thead>

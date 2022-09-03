@@ -82,19 +82,24 @@ body {
 .form-add {
     background-color: #f2efe9;
     display: grid;
-    padding: 5%;
+    padding: 2%;
     border-radius: 5%;
     padding-bottom: 30%;
 }
 
 #sehir-name,
-#ilce-name {
-    margin-top: 5%;
+#ilce-name,
+#wkt-name {
+    margin-top: 2%;
+}
+
+#ulke-name {
+    margin-top: 2%;
 }
 
 .btnParselSave {
     background-color: white;
-    margin-top: -20%;
+    margin-top: -25%;
     width: 40%;
     height: 10%;
     border: 2px solid #8a7979;
@@ -117,6 +122,10 @@ body {
 
 .input {
     width: 100%;
+}
+
+label {
+    margin-bottom: 0px;
 }
 
 .sectionslct {
@@ -170,15 +179,22 @@ body {
     }
 }
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 650px) {
     .modal {
-        height: 60%;
+        height: 65%;
     }
 }
 
 @media screen and (max-width: 350px) {
     .modal {
-        height: 50%;
+        height: 55%;
+    }
+    .input {
+        width: 60%;
+    }
+    .btnParselClose {
+        width: 20%;
+        margin-left: 35px;
     }
 }
 
