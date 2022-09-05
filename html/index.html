@@ -29,14 +29,21 @@
     </nav>
 
     <div id="map" class="map"></div>
-
     <div class="sectionslct">
-        <label for="type" class="parselTypeLabel">Geometry type:</label>
-        <select id="type" class="form-select form-select-lg mb-" aria-label=".form-select-lg example">
-            <option class="parselOption" value="Polygon">Polygon</option>
-            <option selected class="parselOption" value="Point">Point</option>
-            <option class="parselOption" value="LineString">LineString</option>
-        </select>
+        <div class="grid-1">
+            <div class="sidebar">
+                <input type="radio" id="OSMStandart" class="stradiobtn" name="RadioButton" value="OSMStandart" checked>OSM STANDART<br>
+                <input type="radio" id="OSMStamen" class="stradiobtn" name="RadioButton" value="OSMStamen">OSM STAMEN<br>
+            </div>
+        </div>
+        <div class="grid-2">
+            <label for="type" class="parselTypeLabel">Geometry type:</label>
+            <select id="type" class="form-select form-select-lg mb-" aria-label=".form-select-lg example">
+                <option class="parselOption" value="Polygon">Polygon</option>
+                <option selected class="parselOption" value="Point">Point</option>
+                <option class="parselOption" value="LineString">LineString</option>
+            </select>
+        </div>
     </div>
 
     <div id="myModal" class="modal">
@@ -55,6 +62,7 @@
 
                     <label id="wkt-name" for="Wname">Koordinatlar</label>
                     <input class="input" type="text" id="Wkt" name="wkt" disabled>
+                    <a id="krdntedt">EDİT</a>
                 </form>
                 <button class="btnParselSave" id="saveParsel"><p>Parseli Kaydet</p></button>
             </div>

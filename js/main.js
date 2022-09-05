@@ -7,30 +7,34 @@ var toggledata = -1;
 
 
 var wktFortmat = new ol.format.WKT();
-
-const raster = new ol.layer.Tile({
+//katmanlarımız
+const openStreetMapStandard1 = new ol.layer.Tile({
     source: new ol.source.OSM({
-        attributions: "Belsis Parsel Uygulaması"
+        attributions: "Belsis Parsel Uygulaması",
+        visible: true,
+        title: 'OSMStandart',
     })
 });
 
-//const stamen = new ol.layer.Tile({
-//    source: new ol.source.Stamen({
-//        layer: 'watercolor'
-//    })
-//});
+const openStreetMapStamen = new ol.layer.Tile({
+    source: new ol.source.Stamen({
+        layer: 'watercolor',
+        visible: false,
+        title: 'OSMStamen'
+    })
+});
 
 const source = new ol.source.Vector();
-
+//harita çizildi
 const vector = new ol.layer.Vector({
     source: source,
     style: new ol.style.Style({
         fill: new ol.style.Fill({
-            color: 'rgba(255, 255, 255, 0.5)',
+            color: 'rgba(255, 255, 255, 0.5)'
         }),
         stroke: new ol.style.Stroke({
             color: 'red',
-            width: 2,
+            width: 2
         }),
         image: new ol.style.Circle({
             radius: 7,
@@ -40,21 +44,65 @@ const vector = new ol.layer.Vector({
         }),
     }),
 });
-
+//edit için harita çizldi
+const vector1 = new ol.layer.Vector({
+    source: source,
+    style: new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(255, 255, 255, 0.5)'
+        }),
+        stroke: new ol.style.Stroke({
+            color: 'blue',
+            width: 2
+        }),
+        image: new ol.style.Circle({
+            radius: 7,
+            fill: new ol.style.Fill({
+                color: 'blue',
+            }),
+        }),
+    }),
+});
+//harita yüklendi
 var map = new ol.Map({
     controls: [
         new ol.control.FullScreen()
     ],
     target: 'map',
-    layers: [raster, vector],
+    layers: [openStreetMapStandard1, vector],
     view: new ol.View({
         center: ol.proj.fromLonLat([40.00, 42.00]),
         zoom: 4,
         maxZoom: 10,
-        minZoom: 3,
-        rotation: 1
+        minZoom: 3
     })
 });
+
+//katmanlar grubu
+var layersGroup = new ol.layer.Group({
+    layers: [
+        openStreetMapStandard1, vector
+    ]
+})
+
+var layersGroup1 = new ol.layer.Group({
+    layers: [
+        openStreetMapStandard1, openStreetMapStamen, vector
+    ]
+})
+
+//katman değiştirme
+const layerElements = document.querySelectorAll('.sidebar > input[type=radio]');
+var lfirst = true;
+for (let layerElement of layerElements) {
+    layerElement.addEventListener('change', function() {
+        if (layerElement.value == "OSMStamen") {
+            map.setLayerGroup(layersGroup1)
+        } else if (layerElement.value == "OSMStandart") {
+            map.setLayerGroup(layersGroup)
+        }
+    });
+}
 
 let draw;
 
@@ -279,6 +327,8 @@ function GET(id) {
         dataType: 'JSON',
         success: function(data) {
             addModal.style.display = "block";
+            mapfcs.style.pointerEvents = "none";
+            typeSelect.style.pointerEvents = "none";
             yerlestir(data)
             toggledata = id;
             console.log("Getirme Başarılı");
@@ -319,3 +369,36 @@ function UPDATE(data) {
     });
     window.location.reload()
 }
+//edit haritası
+var nwmapbtn = document.getElementById("krdntedt");
+
+var layersGroup2 = new ol.layer.Group({
+    layers: [
+        openStreetMapStandard1, vector1
+    ]
+})
+
+nwmapbtn.addEventListener("click", () => {
+
+    var data = {
+        "Ulke": mdlUlke.value,
+        "Sehir": mdlSehir.value,
+        "Ilce": mdlIlce.value,
+        "WktString": mdWkt.value
+    }
+    source.clear()
+
+    map.setLayerGroup(layersGroup2)
+    const parcel = wktFortmat.readFeature(data.WktString, {
+        dataProjection: 'EPSG:3857',
+        featureProjection: 'EPSG:3857',
+    });
+    source.addFeature(parcel)
+    addModal.style.display = "";
+    mapfcs.style.pointerEvents = "";
+    typeSelect.style.pointerEvents = "";
+
+
+    document.getElementById("OSMStandart").checked = true;
+    addInteractions();
+});
