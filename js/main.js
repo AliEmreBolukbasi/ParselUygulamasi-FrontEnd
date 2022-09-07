@@ -3,8 +3,8 @@ var closeBtn = document.getElementById("closeParsel");
 var parselSave = document.getElementById("saveParsel");
 var mapfcs = document.getElementById("map");
 var inpclr = document.querySelectorAll("input");
-var toggledata = -1;
-
+var crtToggleData = -1; // update de ıd tutmak için ve update create ayrımı
+var edtToggleData = -1; // update de index tutmak için
 
 var wktFortmat = new ol.format.WKT();
 //katmanlarımız
@@ -119,42 +119,56 @@ typeSelect.onchange = () => {
 };
 
 function addInteractions() {
-    if (addModal.style.display == "") {
-        draw = new ol.interaction.Draw({
-            source: source,
-            type: typeSelect.value,
-        });
-        map.addInteraction(draw);
-        draw.on('drawend', drawend);
-    }
+    draw = new ol.interaction.Draw({
+        source: source,
+        type: typeSelect.value,
+    });
+    map.addInteraction(draw);
+    draw.on('drawend', drawend);
 }
 //çizim bitince
 function drawend() {
+    if (edtToggleData == -1) {
+        inpclr.forEach(function(inpt) {
+            inpt.value = "";
+        });
+    }
+    drawput();
     addModal.style.display = "block";
     mapfcs.style.pointerEvents = 'none';
     typeSelect.style.pointerEvents = 'none';
-
-    inpclr.forEach(function(inpt) {
-        inpt.value = "";
-    });
-
-
 }
-//ekleme sayfa kapatma
+//açılır pencere için ekleme
+function drawput() {
+    mdWkt.value = draw.Ah.toUpperCase() + "(";
+    if (draw.Ah == "Point") {
+        mdWkt.value += draw._v[0] + " " + draw._v[1];
+    } else {
+        mdWkt.value += "(";
+        for (var x = 0; x < draw._v[0].length; x++) {
+            mdWkt.value += draw._v[0][x][0] + " " + draw._v[0][x][1];
+        }
+        mdWkt.value += ")";
+    }
+    mdWkt.value += ")";
+}
+
+//ekleme update sayfa kapatma
 closeBtn.addEventListener("click", () => {
-    if (toggledata == -1) {
-        map.removeInteraction(draw);
+    if (crtToggleData == -1) {
         var a = source.getFeatures();
         var b = a[a.length - 1];
         source.removeFeature(b);
         addModal.style.display = "";
         mapfcs.style.pointerEvents = "";
         typeSelect.style.pointerEvents = "";
+        map.removeInteraction(draw);
         addInteractions();
     } else {
         addModal.style.display = "";
         mapfcs.style.pointerEvents = "";
         typeSelect.style.pointerEvents = "";
+        map.removeInteraction(draw);
         addInteractions();
     }
 
@@ -166,28 +180,50 @@ parselSave.addEventListener("click", () => {
     mapfcs.style.pointerEvents = "";
     typeSelect.style.pointerEvents = "";
 
-    if (toggledata == -1) {
-        var datas = source.getFeatures()
-        const x = wktFortmat.writeFeature(datas[datas.length - 1])
+    if (crtToggleData == -1) { // create için
         var data = {
-            "Ulke": $("#myModal #Ulke").val(),
-            "Sehir": $("#myModal #Sehir").val(),
-            "Ilce": $("#myModal #Ilce").val(),
-            "WktString": x
-        }
-        POST(data);
-    } else {
-        var data = {
-            "Id": toggledata,
             "Ulke": $("#myModal #Ulke").val(),
             "Sehir": $("#myModal #Sehir").val(),
             "Ilce": $("#myModal #Ilce").val(),
             "WktString": $("#myModal #Wkt").val()
         }
+        if (editclck != 0) {
+            source.clear();
+            map.setLayerGroup(layersGroup)
+            for (var x = 0; x < tempsoruce.length; x++) {
+                source.addFeature(tempsoruce[x]);
+            }
+        }
+        editclck = 0;
+        const parcel = wktFortmat.readFeature(data.WktString, {
+            dataProjection: 'EPSG:3857',
+            featureProjection: 'EPSG:3857',
+        });
+        source.addFeature(parcel)
+        POST(data);
+    } else { // edit için 
+        var data = {
+            "Id": crtToggleData, //id, butonun id sine eşit
+            "Ulke": $("#myModal #Ulke").val(),
+            "Sehir": $("#myModal #Sehir").val(),
+            "Ilce": $("#myModal #Ilce").val(),
+            "WktString": $("#myModal #Wkt").val()
+        }
+        source.clear();
+        map.setLayerGroup(layersGroup)
+        for (var x = 0; x < tempsoruce.length; x++) {
+            if (edtToggleData == x) {
+                const parcel = wktFortmat.readFeature(data.WktString, {
+                    dataProjection: 'EPSG:3857',
+                    featureProjection: 'EPSG:3857',
+                });
+                source.addFeature(parcel)
+            } else {
+                source.addFeature(tempsoruce[x]);
+            }
+        }
         UPDATE(data);
-        toggledata = -1;
     }
-
 });
 
 //ekleme veri tabanına gönder
@@ -198,14 +234,16 @@ function POST(data) {
         contentType: 'application/json',
         data: JSON.stringify(data),
         dataType: 'JSON',
-        success: function() {
+        success: function(datas) {
             console.log("Ekleme Başarılı");
+            tableCreate(datas)
+            btnSilHazırla()
+            btnEditHazırla()
         },
         error: function(data) {
             console.log(data.status + ':' + data.statusText, data.responseText);
         }
     });
-    window.location.reload()
 }
 
 //veri tabanı getirme
@@ -216,16 +254,24 @@ function GETALL() {
         contentType: 'application/json',
         dataType: 'JSON',
         success: function(data) {
-            data.forEach(getir);
-            btnSilHazırla()
-            btnEditHazırla()
+            for (var x = 0; x < data.length; x++) {
+                tableCreate(data[x])
+                const parcel = wktFortmat.readFeature(data[x].wktString, {
+                    dataProjection: 'EPSG:3857',
+                    featureProjection: 'EPSG:3857',
+                });
+                source.addFeature(parcel)
+            }
+            tempsoruce = source.getFeatures();
+            btnSilHazırla();
+            btnEditHazırla();
         }
     });
 }
 //veri tabanı getirme tablo aktarma
 var tblbd = document.getElementById("tblBody");
 
-function getir(item, index, arr) {
+function tableCreate(item) {
     //tablo oluşturma
     let tid = document.createElement("td");
     let tulke = document.createElement("td");
@@ -246,18 +292,16 @@ function getir(item, index, arr) {
     btnsil.innerHTML = "SİL";
     btnsil.className = "sil btn btn-danger";
     btnsil.id = item.id;
-
     tedit.appendChild(btnedit);
     tdel.appendChild(btnsil);
 
-    tid.textContent = index + 1;
+    tid.textContent = item.id;
     tulke.textContent = item.ulke;
     tsehir.textContent = item.sehir;
     tilce.textContent = item.ilce;
     tkrdnt.textContent = item.wktString;
 
     let tr = document.createElement("tr");
-
     tr.appendChild(tid);
     tr.appendChild(tulke);
     tr.appendChild(tsehir);
@@ -266,32 +310,35 @@ function getir(item, index, arr) {
     tr.appendChild(tedit);
     tr.appendChild(tdel);
 
+    tr.id = item.id;
+
     tblbd.appendChild(tr);
-
-    //feature ekleme
-    const parcel = wktFortmat.readFeature(item.wktString, {
-        dataProjection: 'EPSG:3857',
-        featureProjection: 'EPSG:3857',
-    });
-    source.addFeature(parcel)
-
 }
 //SİL butonlarının dinleme olayları
-
-var silBtn = document.getElementsByClassName("sil");
+var tut = false;
 
 function btnSilHazırla() {
-    for (var i = 0; i < silBtn.length; i++) {
-        (function(index) {
-            silBtn[index].addEventListener("click", () => {
-                DELETE(silBtn[index].id)
-            });
-        })(i)
+    for (var i = 0; i < source.getFeatures().length; i++) {
+        var silBtn = document.querySelectorAll(".sil");
+        tut = false;
+        debugger
+            (function(index) {
+                silBtn[index].addEventListener("click", () => {
+                    if (tut == false) {
+                        debugger
+                        DELETE(silBtn[index].id, index);
+                        tut = true;
+                        debugger
+                    }
+                });
+            })(i)
     }
 }
+var tble = document.getElementById('tblBody');
+//veri tabanı bağlantı
 
-//veri tabanı getirme
-function DELETE(id) {
+function DELETE(id, index) {
+    debugger
     $.ajax({
         type: "DELETE",
         url: "https://localhost:5001/Parsel/" + id,
@@ -299,27 +346,37 @@ function DELETE(id) {
         dataType: 'JSON',
         success: function() {
             console.log("Silme Başarılı");
-        }
+            tble.deleteRow(index);
+            var a = source.getFeatures();
+            source.removeFeature(a[index]);
+            btnSilHazırla();
+            btnEditHazırla();
+            debugger
+        },
+        error: function(datas) {
+            console.log(datas.status + ':' + datas.statusText, datas.responseText);
+        },
     });
-    window.location.reload()
 }
 
 //Update butonlarının dinleme olayları
-
-var updateBtn = document.getElementsByClassName("edit");
-
 function btnEditHazırla() {
-    for (var i = 0; i < updateBtn.length; i++) {
+    for (var i = 0; i < source.getFeatures().length; i++) {
+        var updateBtn = document.querySelectorAll(".edit");
+        tut = false;
         (function(index) {
             updateBtn[index].addEventListener("click", () => {
-                GET(updateBtn[index].id)
+                if (tut == false) {
+                    GET(updateBtn[index].id, index);
+                    tut = true;
+                }
             });
         })(i)
     }
 }
 
 //veri tabanı id ye göre getirme
-function GET(id) {
+function GET(id, index) {
     $.ajax({
         type: "GET",
         url: "https://localhost:5001/Parsel/" + id,
@@ -330,7 +387,8 @@ function GET(id) {
             mapfcs.style.pointerEvents = "none";
             typeSelect.style.pointerEvents = "none";
             yerlestir(data)
-            toggledata = id;
+            crtToggleData = id;
+            edtToggleData = index;
             console.log("Getirme Başarılı");
         },
         error: function(data) {
@@ -360,14 +418,21 @@ function UPDATE(data) {
         contentType: 'application/json',
         dataType: 'JSON',
         data: JSON.stringify(data),
-        success: function() {
-            console.log("Güncelleme Başarılı");
+        success: function(datas) {
+            console.log("Güncelleme Başarılı")
+            tble.rows[edtToggleData].cells[1].innerHTML = datas.ulke;
+            tble.rows[edtToggleData].cells[2].innerHTML = datas.sehir;
+            tble.rows[edtToggleData].cells[3].innerHTML = datas.ilce;
+            tble.rows[edtToggleData].cells[4].innerHTML = datas.wktString;
+            crtToggleData, edtToggleData = -1;
+            btnSilHazırla();
+            btnEditHazırla();
         },
         error: function(data) {
-            console.log(data.status + ':' + data.statusText, data.responseText);
+            console.log(data.status + ':' + data.statusText, data.responseText)
         }
     });
-    window.location.reload()
+
 }
 //edit haritası
 var nwmapbtn = document.getElementById("krdntedt");
@@ -378,16 +443,20 @@ var layersGroup2 = new ol.layer.Group({
     ]
 })
 
+var tempsoruce;
+var editclck = 0;
 nwmapbtn.addEventListener("click", () => {
-
+    editclck++;
     var data = {
         "Ulke": mdlUlke.value,
         "Sehir": mdlSehir.value,
         "Ilce": mdlIlce.value,
         "WktString": mdWkt.value
     }
+    if (editclck == 0) {
+        tempsoruce = source.getFeatures();
+    }
     source.clear()
-
     map.setLayerGroup(layersGroup2)
     const parcel = wktFortmat.readFeature(data.WktString, {
         dataProjection: 'EPSG:3857',
@@ -397,8 +466,5 @@ nwmapbtn.addEventListener("click", () => {
     addModal.style.display = "";
     mapfcs.style.pointerEvents = "";
     typeSelect.style.pointerEvents = "";
-
-
     document.getElementById("OSMStandart").checked = true;
-    addInteractions();
 });
