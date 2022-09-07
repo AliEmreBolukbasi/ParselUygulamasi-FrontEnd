@@ -17,6 +17,7 @@ const openStreetMapStandard1 = new ol.layer.Tile({
 });
 
 const openStreetMapStamen = new ol.layer.Tile({
+    attributions: "Belsis Parsel Uygulaması",
     source: new ol.source.Stamen({
         layer: 'watercolor',
         visible: false,
@@ -193,14 +194,16 @@ parselSave.addEventListener("click", () => {
             for (var x = 0; x < tempsoruce.length; x++) {
                 source.addFeature(tempsoruce[x]);
             }
+            const parcel = wktFortmat.readFeature(data.WktString, {
+                dataProjection: 'EPSG:3857',
+                featureProjection: 'EPSG:3857',
+            });
+            source.addFeature(parcel)
+            editclck = 0;
         }
-        editclck = 0;
-        const parcel = wktFortmat.readFeature(data.WktString, {
-            dataProjection: 'EPSG:3857',
-            featureProjection: 'EPSG:3857',
-        });
-        source.addFeature(parcel)
+        console.log(source.getFeatures())
         POST(data);
+        debugger
     } else { // edit için 
         var data = {
             "Id": crtToggleData, //id, butonun id sine eşit
@@ -239,6 +242,8 @@ function POST(data) {
             tableCreate(datas)
             btnSilHazırla()
             btnEditHazırla()
+            console.log(source.getFeatures())
+            debugger
         },
         error: function(data) {
             console.log(data.status + ':' + data.statusText, data.responseText);
@@ -316,13 +321,15 @@ function tableCreate(item) {
 }
 //SİL butonlarının dinleme olayları
 var tut = false;
+var silBtn = document.querySelectorAll(".sil");
 
 function btnSilHazırla() {
     for (var i = 0; i < source.getFeatures().length; i++) {
-        var silBtn = document.querySelectorAll(".sil");
+        silBtn = document.querySelectorAll(".sil");
         tut = false;
         debugger
             (function(index) {
+                debugger
                 silBtn[index].addEventListener("click", () => {
                     if (tut == false) {
                         debugger
@@ -446,15 +453,20 @@ var layersGroup2 = new ol.layer.Group({
 var tempsoruce;
 var editclck = 0;
 nwmapbtn.addEventListener("click", () => {
-    editclck++;
+    if (crtToggleData == -1) { //create de edite basıldığında
+        var a = source.getFeatures();
+        var b = a[a.length - 1];
+        source.removeFeature(b);
+    }
+    if (editclck == 0) { // ilk defa çağrıldığında feature yedekle
+        tempsoruce = source.getFeatures();
+        editclck++;
+    }
     var data = {
         "Ulke": mdlUlke.value,
         "Sehir": mdlSehir.value,
         "Ilce": mdlIlce.value,
         "WktString": mdWkt.value
-    }
-    if (editclck == 0) {
-        tempsoruce = source.getFeatures();
     }
     source.clear()
     map.setLayerGroup(layersGroup2)
@@ -463,8 +475,11 @@ nwmapbtn.addEventListener("click", () => {
         featureProjection: 'EPSG:3857',
     });
     source.addFeature(parcel)
+
     addModal.style.display = "";
     mapfcs.style.pointerEvents = "";
     typeSelect.style.pointerEvents = "";
+
     document.getElementById("OSMStandart").checked = true;
+    console.log(source.getFeatures())
 });
