@@ -279,3 +279,12 @@ label {
 .stradiobtn {
     margin: 0% 2% 0% 2%;
 }
+
+.yukarikaydir {
+    display: none;
+    padding: 10px;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    text-decoration: none;
+}

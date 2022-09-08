@@ -86,15 +86,32 @@
             <tbody id="tblBody"></tbody>
         </table>
     </div>
+    <a href="#" class="yukarikaydir"><img src="/res/upper.png" alt="up" width="40" height="40"></a>
     <script type="module" src="../js/main.js"></script>
     <script>
-        //Tabloyu filtreleme
+        //Table filter
         $(document).ready(function() {
             $("#myInput").on("keyup", function() {
                 var value = $(this).val().toLowerCase();
                 $("#tblBody tr").filter(function() {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                 });
+            });
+        });
+        //upslider
+        $(document).ready(function() {
+            $(window).scroll(function() {
+                if ($(this).scrollTop() > 100) {
+                    $('.yukarikaydir').fadeIn();
+                } else {
+                    $('.yukarikaydir').fadeOut();
+                }
+            });
+            $('.yukarikaydir').click(function() {
+                $("html, body").animate({
+                    scrollTop: 0
+                }, 600);
+                return false;
             });
         });
     </script>
