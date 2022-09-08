@@ -134,8 +134,7 @@ function drawend(e) {
             inpt.value = "";
         });
     }
-    const x = e.feature
-    const c = wktFortmat.writeFeature(x)
+    const c = wktFortmat.writeFeature(e.feature) //feature eklendi
     mdWkt.value = c;
 
     addModal.style.display = "block";
@@ -178,8 +177,8 @@ parselSave.addEventListener("click", () => {
             "WktString": $("#myModal #Wkt").val()
         }
         if (editclck != 0) {
-            source.clear();
-            map.setLayerGroup(layersGroup)
+            source.clear(); //inputta tuttuğum için source gerek kalmadı
+            map.setLayerGroup(layersGroup) // eski katmana geçiş
             for (var x = 0; x < tempsoruce.length; x++) {
                 source.addFeature(tempsoruce[x]);
             }
@@ -228,8 +227,8 @@ function POST(data) {
         success: function(datas) {
             console.log("Ekleme Başarılı");
             tableCreate(datas)
-            btnSilHazırla()
-            btnEditHazırla()
+            btnDelPrepare()
+            btnEditPrepare()
         },
         error: function(data) {
             console.log(data.status + ':' + data.statusText, data.responseText);
@@ -237,7 +236,7 @@ function POST(data) {
     });
 }
 
-//veri tabanı getirme
+//sayfa yüklendiğinde veri tabanı getirme
 function GETALL() {
     $.ajax({
         type: "GET",
@@ -254,8 +253,8 @@ function GETALL() {
                 source.addFeature(parcel)
             }
             tempsoruce = source.getFeatures();
-            btnSilHazırla();
-            btnEditHazırla();
+            btnDelPrepare();
+            btnEditPrepare();
         }
     });
 }
@@ -272,19 +271,19 @@ function tableCreate(item) {
     let tedit = document.createElement("td");
     let tdel = document.createElement("td");
     let btnedit = document.createElement("button");
-    let btnsil = document.createElement("button");
+    let btndel = document.createElement("button");
 
     btnedit.type = "button";
     btnedit.innerHTML = "GÜNCELLE";
     btnedit.className = "edit btn btn-primary";
     btnedit.id = item.id;
 
-    btnsil.type = "button";
-    btnsil.innerHTML = "SİL";
-    btnsil.className = "sil btn btn-danger";
-    btnsil.id = item.id;
+    btndel.type = "button";
+    btndel.innerHTML = "SİL";
+    btndel.className = "sil btn btn-danger";
+    btndel.id = item.id;
     tedit.appendChild(btnedit);
-    tdel.appendChild(btnsil);
+    tdel.appendChild(btndel);
 
     tid.textContent = item.id;
     tulke.textContent = item.ulke;
@@ -308,10 +307,10 @@ function tableCreate(item) {
 var tut = false;
 var silBtn = document.querySelectorAll(".sil");
 
-function btnSilHazırla() {
+function btnDelPrepare() {
     for (var i = 0; i < source.getFeatures().length; i++) {
         silBtn = document.querySelectorAll(".sil");
-        tut = false;
+        tut = false; //listener içinde for a girmemesi için tut değişkeni oluşturdum
         (function(index) {
             silBtn[index].addEventListener("click", () => {
                 if (tut == false) {
@@ -336,8 +335,8 @@ function DELETE(id, index) {
             tble.deleteRow(index);
             var a = source.getFeatures();
             source.removeFeature(a[index]);
-            btnSilHazırla();
-            btnEditHazırla();
+            btnDelPrepare();
+            btnEditPrepare();
         },
         error: function(datas) {
             console.log(datas.status + ':' + datas.statusText, datas.responseText);
@@ -346,7 +345,7 @@ function DELETE(id, index) {
 }
 
 //Update butonlarının dinleme olayları
-function btnEditHazırla() {
+function btnEditPrepare() {
     for (var i = 0; i < source.getFeatures().length; i++) {
         var updateBtn = document.querySelectorAll(".edit");
         tut = false;
@@ -406,13 +405,13 @@ function UPDATE(data) {
         data: JSON.stringify(data),
         success: function(datas) {
             console.log("Güncelleme Başarılı")
-            tble.rows[edtToggleData].cells[1].innerHTML = datas.ulke;
+            tble.rows[edtToggleData].cells[1].innerHTML = datas.ulke; // id ye göre tablo güncelleme
             tble.rows[edtToggleData].cells[2].innerHTML = datas.sehir;
             tble.rows[edtToggleData].cells[3].innerHTML = datas.ilce;
             tble.rows[edtToggleData].cells[4].innerHTML = datas.wktString;
             crtToggleData, edtToggleData = -1;
-            btnSilHazırla();
-            btnEditHazırla();
+            btnDelPrepare();
+            btnEditPrepare();
         },
         error: function(data) {
             console.log(data.status + ':' + data.statusText, data.responseText)
