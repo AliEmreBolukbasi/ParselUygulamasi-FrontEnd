@@ -129,6 +129,11 @@ function addInteractions() {
 }
 //çizim bitince
 function drawend(e) {
+    if (edtToggleData == -1) {
+        inpclr.forEach(function(inpt) {
+            inpt.value = "";
+        });
+    }
     const x = e.feature
     const c = wktFortmat.writeFeature(x)
     mdWkt.value = c;
@@ -136,15 +141,6 @@ function drawend(e) {
     addModal.style.display = "block";
     mapfcs.style.pointerEvents = 'none';
     typeSelect.style.pointerEvents = 'none';
-}
-
-function drawput(e) {
-    let a = source.getFeatures()
-    if (a.length > 0) {
-        let b = a[a.length - 1]
-        let c = wktFortmat.writeFeature(b)
-        mdWkt.value = c;
-    }
 }
 
 //ekleme update sayfa kapatma
@@ -215,6 +211,7 @@ parselSave.addEventListener("click", () => {
             } else {
                 source.addFeature(tempsoruce[x]);
             }
+            editclck = 0;
         }
         UPDATE(data);
     }
@@ -303,7 +300,6 @@ function tableCreate(item) {
     tr.appendChild(tkrdnt);
     tr.appendChild(tedit);
     tr.appendChild(tdel);
-
     tr.id = item.id;
 
     tblbd.appendChild(tr);
