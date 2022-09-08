@@ -128,30 +128,23 @@ function addInteractions() {
     draw.on('drawend', drawend);
 }
 //çizim bitince
-function drawend() {
-    if (edtToggleData == -1) {
-        inpclr.forEach(function(inpt) {
-            inpt.value = "";
-        });
-    }
-    drawput();
+function drawend(e) {
+    const x = e.feature
+    const c = wktFortmat.writeFeature(x)
+    mdWkt.value = c;
+
     addModal.style.display = "block";
     mapfcs.style.pointerEvents = 'none';
     typeSelect.style.pointerEvents = 'none';
 }
-//açılır pencere için ekleme
-function drawput() {
-    mdWkt.value = draw.Ah.toUpperCase() + "(";
-    if (draw.Ah == "Point") {
-        mdWkt.value += draw._v[0] + " " + draw._v[1];
-    } else {
-        mdWkt.value += "(";
-        for (var x = 0; x < draw._v[0].length; x++) {
-            mdWkt.value += draw._v[0][x][0] + " " + draw._v[0][x][1];
-        }
-        mdWkt.value += ")";
+
+function drawput(e) {
+    let a = source.getFeatures()
+    if (a.length > 0) {
+        let b = a[a.length - 1]
+        let c = wktFortmat.writeFeature(b)
+        mdWkt.value = c;
     }
-    mdWkt.value += ")";
 }
 
 //ekleme update sayfa kapatma
@@ -201,9 +194,7 @@ parselSave.addEventListener("click", () => {
             source.addFeature(parcel)
             editclck = 0;
         }
-        console.log(source.getFeatures())
         POST(data);
-        debugger
     } else { // edit için 
         var data = {
             "Id": crtToggleData, //id, butonun id sine eşit
@@ -242,8 +233,6 @@ function POST(data) {
             tableCreate(datas)
             btnSilHazırla()
             btnEditHazırla()
-            console.log(source.getFeatures())
-            debugger
         },
         error: function(data) {
             console.log(data.status + ':' + data.statusText, data.responseText);
@@ -327,25 +316,20 @@ function btnSilHazırla() {
     for (var i = 0; i < source.getFeatures().length; i++) {
         silBtn = document.querySelectorAll(".sil");
         tut = false;
-        debugger
-            (function(index) {
-                debugger
-                silBtn[index].addEventListener("click", () => {
-                    if (tut == false) {
-                        debugger
-                        DELETE(silBtn[index].id, index);
-                        tut = true;
-                        debugger
-                    }
-                });
-            })(i)
+        (function(index) {
+            silBtn[index].addEventListener("click", () => {
+                if (tut == false) {
+                    DELETE(silBtn[index].id, index);
+                    tut = true;
+                }
+            });
+        })(i)
     }
 }
 var tble = document.getElementById('tblBody');
 //veri tabanı bağlantı
 
 function DELETE(id, index) {
-    debugger
     $.ajax({
         type: "DELETE",
         url: "https://localhost:5001/Parsel/" + id,
@@ -358,7 +342,6 @@ function DELETE(id, index) {
             source.removeFeature(a[index]);
             btnSilHazırla();
             btnEditHazırla();
-            debugger
         },
         error: function(datas) {
             console.log(datas.status + ':' + datas.statusText, datas.responseText);
@@ -481,5 +464,4 @@ nwmapbtn.addEventListener("click", () => {
     typeSelect.style.pointerEvents = "";
 
     document.getElementById("OSMStandart").checked = true;
-    console.log(source.getFeatures())
 });
